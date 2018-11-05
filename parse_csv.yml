@@ -1,0 +1,39 @@
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: parse csv and make vars file
+      command: "python csv_to_yaml.py methods.csv"
+ 
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - methods.csv.yml
+  tasks:
+    - name: get all metrics
+      set_fact:
+        metrics: "{{csv_data | map(attribute='metric')| list | unique }}"
+
+#    - name: create metrics
+#      uri:
+#        url:
+#        method: POST
+#      register: metrics_results
+#
+#    - name: set metrics results fact
+#      set_fact:
+#        metrics: "{{ metrics_results.results | map(attribute='json') | map(attribute='metric') }}"
+#
+#    - name: create methods
+#      uri:
+#        url: www.google.com
+#        method: POST
+#        body_format: json
+#        body:
+#          service_id:
+#          http_method:
+#          pattern:
+#          delta: 1
+#          metric_id: "{{ (metrics |  selectattr('name', 'equalto', item.metric) | list | first).id  }}"
+
